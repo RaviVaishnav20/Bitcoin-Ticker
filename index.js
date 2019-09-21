@@ -11,10 +11,29 @@ app.get("/",function(req, res){
 });
 
 app.post("/", function(req, res){
-  var symbol = req.body.crypto + "" + req.body.fiat;
 
-  request("https://apiv2.bitcoinaverage.com/indices/global/ticker/"+symbol,function(error, response, body){
-    console.log(body);
+  var crypto = req.body.crypto;
+  var fiat = req.body.fiat;
+  var amount = req.body.amount;
+  var options = {
+    url: "https://apiv2.bitcoinaverage.com/convert/global",
+    method: "GET",
+    qs: {
+      from: crypto,
+      to: fiat,
+      amount: amount
+    }
+  };
+
+
+  request(options,function(error, response, body){
+    //convert json object to java script object
+    var data = JSON.parse(body);
+    var currentData = data.time;
+    res.write("<p>Current date is: " + currentData +"</p>");
+    res.write("<h1>This is the current price of " + amount +" " + crypto +" "+ data.price+" "+fiat+"</h1>");
+    res.send();
+
   });
 });
 
